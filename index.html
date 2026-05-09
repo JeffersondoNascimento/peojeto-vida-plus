@@ -1,0 +1,189 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>VidaPlus SGHSS</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://unpkg.com/lucide@latest"></script>
+</head>
+<body class="bg-gray-100" style="font-family: Arial, Helvetica, sans-serif; line-height: 1.6;">
+
+<!-- LOGIN -->
+<section id="login" class="flex items-center justify-center h-screen px-4">
+  <div class="bg-white p-8 rounded-2xl shadow-lg w-full max-w-sm animate-fade">
+    <h2 class="text-2xl font-bold mb-6 text-center">VidaPlus</h2>
+    <input id="email" class="border p-2 mb-3 w-full rounded" placeholder="Email">
+    <input id="senha" type="password" class="border p-2 mb-4 w-full rounded" placeholder="Senha">
+    <button onclick="login()" class="bg-blue-600 hover:bg-blue-700 text-white w-full py-2 rounded">Entrar</button>
+  </div>
+</section>
+
+<div id="sistema" class="hidden min-h-screen flex flex-col md:flex-row">
+
+  <!-- Topbar Mobile -->
+  <div class="md:hidden bg-blue-700 text-white p-4 flex justify-between items-center">
+    <span class="font-bold">VidaPlus</span>
+    <button onclick="toggleMenu()" class="bg-blue-600 px-3 py-1 rounded">☰</button>
+  </div>
+
+  <!-- Sidebar -->
+  <aside id="sidebar" class="hidden md:flex md:flex-col w-full md:w-64 bg-blue-700 text-white p-6 space-y-2 transition-all duration-300">
+    <h1 class="text-2xl font-bold mb-4 hidden md:block">VidaPlus</h1>
+
+    <button onclick="show('dashboard')" class="flex items-center gap-2 py-2 px-2 rounded hover:bg-blue-600">
+      <i data-lucide="layout-dashboard"></i> Dashboard
+    </button>
+
+    <button onclick="show('pacientes')" class="flex items-center gap-2 py-2 px-2 rounded hover:bg-blue-600">
+      <i data-lucide="users"></i> Pacientes
+    </button>
+
+    <button onclick="show('medicos')" class="flex items-center gap-2 py-2 px-2 rounded hover:bg-blue-600">
+      <i data-lucide="stethoscope"></i> Médicos
+    </button>
+
+    <button onclick="show('agendamento')" class="flex items-center gap-2 py-2 px-2 rounded hover:bg-blue-600">
+      <i data-lucide="calendar"></i> Agendamento
+    </button>
+  </aside>
+
+  <!-- Main -->
+  <main class="flex-1 p-4 sm:p-6">
+
+    <section id="dashboard" class="hidden animate-fade">
+      <h2 class="text-xl sm:text-2xl font-bold mb-4">Dashboard</h2>
+      <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+        <div class="bg-white p-4 rounded-2xl shadow hover:scale-105 transition">
+          <p class="text-gray-500">Pacientes</p>
+          <p id="totalPacientes" class="text-3xl font-bold">0</p>
+        </div>
+        <div class="bg-white p-4 rounded-2xl shadow hover:scale-105 transition">
+          <p class="text-gray-500">Consultas</p>
+          <p id="totalConsultas" class="text-3xl font-bold">0</p>
+        </div>
+        <div class="bg-white p-4 rounded-2xl shadow">
+          <p class="text-gray-500">Sistema</p>
+          <p class="text-green-600 font-bold">Online</p>
+        </div>
+      </div>
+    </section>
+
+    <section id="pacientes" class="hidden animate-fade">
+      <h2 class="text-xl sm:text-2xl font-bold mb-4">Pacientes</h2>
+      <div class="bg-white p-4 rounded-2xl shadow mb-4">
+        <input id="nomePaciente" class="border p-2 mb-2 w-full rounded" placeholder="Nome">
+        <button onclick="addPaciente()" class="bg-blue-600 text-white px-4 py-2 rounded w-full sm:w-auto">Cadastrar</button>
+      </div>
+      <ul id="listaPacientes" class="bg-white p-4 rounded-2xl shadow"></ul>
+    </section>
+
+    <section id="medicos" class="hidden animate-fade">
+      <h2 class="text-xl sm:text-2xl font-bold mb-4">Médicos</h2>
+      <div class="bg-white p-4 rounded-2xl shadow mb-4">
+        <input id="nomeMedico" class="border p-2 mb-2 w-full rounded" placeholder="Nome">
+        <input id="espMedico" class="border p-2 mb-2 w-full rounded" placeholder="Especialidade">
+        <button onclick="addMedico()" class="bg-green-600 text-white px-4 py-2 rounded w-full sm:w-auto">Cadastrar</button>
+      </div>
+      <ul id="listaMedicos" class="bg-white p-4 rounded-2xl shadow"></ul>
+    </section>
+
+    <section id="agendamento" class="hidden animate-fade">
+      <h2 class="text-xl sm:text-2xl font-bold mb-4">Agendamento</h2>
+      <div class="bg-white p-4 rounded-2xl shadow mb-4">
+        <select id="pacienteSelect" class="border p-2 mb-2 w-full rounded"></select>
+        <select id="medicoSelect" class="border p-2 mb-2 w-full rounded"></select>
+        <input id="dataConsulta" type="date" class="border p-2 mb-2 w-full rounded">
+        <input id="horaConsulta" type="time" class="border p-2 mb-2 w-full rounded">
+        <button onclick="agendar()" class="bg-purple-600 text-white px-4 py-2 rounded w-full sm:w-auto">Agendar</button>
+      </div>
+      <ul id="listaConsultas" class="bg-white p-4 rounded-2xl shadow"></ul>
+    </section>
+
+  </main>
+</div>
+
+<script>
+lucide.createIcons();
+
+let pacientes = [];
+let medicos = [];
+let consultas = [];
+
+function login() {
+  document.getElementById('login').style.display = 'none';
+  document.getElementById('sistema').classList.remove('hidden');
+  show('dashboard');
+}
+
+function toggleMenu() {
+  document.getElementById('sidebar').classList.toggle('hidden');
+}
+
+function show(id) {
+  ['dashboard','pacientes','medicos','agendamento'].forEach(s => {
+    document.getElementById(s).classList.add('hidden');
+  });
+  document.getElementById(id).classList.remove('hidden');
+  if (id === 'agendamento') atualizarSelects();
+}
+
+function addPaciente() {
+  const nome = document.getElementById('nomePaciente').value;
+  if (!nome) return alert('Digite o nome');
+  pacientes.push(nome);
+  document.getElementById('listaPacientes').innerHTML += `<li class="border-b py-1">${nome}</li>`;
+  atualizarDashboard();
+}
+
+function addMedico() {
+  const nome = document.getElementById('nomeMedico').value;
+  const esp = document.getElementById('espMedico').value;
+  if (!nome) return alert('Digite o nome');
+  medicos.push({nome, esp});
+  document.getElementById('listaMedicos').innerHTML += `<li class="border-b py-1">${nome} - ${esp}</li>`;
+}
+
+function atualizarSelects() {
+  const p = document.getElementById('pacienteSelect');
+  const m = document.getElementById('medicoSelect');
+  p.innerHTML = '<option>Selecione paciente</option>';
+  m.innerHTML = '<option>Selecione médico</option>';
+  pacientes.forEach(nome => p.innerHTML += `<option>${nome}</option>`);
+  medicos.forEach(med => m.innerHTML += `<option>${med.nome} - ${med.esp}</option>`);
+}
+
+function agendar() {
+  const paciente = document.getElementById('pacienteSelect').value;
+  const medico = document.getElementById('medicoSelect').value;
+  if (!paciente || !medico) return alert('Preencha tudo');
+  const data = document.getElementById('dataConsulta').value;
+  const hora = document.getElementById('horaConsulta').value;
+
+  if (!data || !hora) return alert('Selecione data e hora');
+
+  consultas.push({paciente, medico, data, hora});
+  document.getElementById('listaConsultas').innerHTML += `<li class="border-b py-2">
+    <strong>${paciente}</strong><br>
+    ${medico}<br>
+    📅 ${data} ⏰ ${hora}
+  </li>`;
+  atualizarDashboard();
+}
+
+function atualizarDashboard() {
+  document.getElementById('totalPacientes').innerText = pacientes.length;
+  document.getElementById('totalConsultas').innerText = consultas.length;
+}
+</script>
+
+<style>
+@keyframes fade {
+  from {opacity: 0; transform: translateY(10px);} 
+  to {opacity: 1; transform: translateY(0);} 
+}
+.animate-fade { animation: fade 0.3s ease-in-out; }
+</style>
+
+</body>
+</html>
